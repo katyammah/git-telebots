@@ -15,9 +15,10 @@ def db_data_add(month, id: int, workout_ex, date):
 
 
 def get_num_id(month):
-    list_of_w = cur.execute('SELECT MAX(id) FROM {}'.format(month))
-    if list_of_w.fetchall() == [(None,)]:
+    cur.execute('SELECT MAX(id) FROM {}'.format(month))
+    num = cur.fetchone()[0]
+    if num is None:
         num_id = 1
     else:
-        num_id = list_of_w.fetchone()[0] + 1
+        num_id = num + 1
     return num_id
