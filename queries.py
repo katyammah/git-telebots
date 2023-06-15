@@ -1,10 +1,7 @@
 import sqlite3
 
-con = sqlite3.connect('database2.db', check_same_thread=False)
-cur = con.cursor()
 
-
-def create_table(month):
+def create_table(month, cur, con):
     cur.execute('CREATE TABLE IF NOT EXISTS {} (id INTEGER PRIMARY KEY, workout_ex TEXT, date NOT NULL)'.format(month))
     con.commit()
 
