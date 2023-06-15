@@ -1,14 +1,21 @@
-import telebot
-from telebot import types
 import os
-from dotenv import load_dotenv, find_dotenv
 import random
+import sqlite3
 import time
-import schedule
 from threading import Thread
+
+import schedule
+import telebot
+from dotenv import find_dotenv, load_dotenv
+from telebot import types
+
 import constants as cs
-from constants import chat_id
 import queries
+from constants import chat_id
+from utils import calc_dates
+
+con = sqlite3.connect('database2.db', check_same_thread=False)
+cur = con.cursor()
 
 queries.create_table(month=cs.month_name)
 
@@ -102,12 +109,13 @@ def answer(call):
 
 
 def do_schedule():
-    schedule.every().monday.at(cs.first_remind_at).do(start)
-    schedule.every().wednesday.at(cs.first_remind_at).do(start)
-    schedule.every().saturday.at(cs.first_remind_at).do(start)
-#   schedule.every().day.at(cs.first_remind_at).do(start)  # uncomment for checking code
+    first_remind_at, second_remind_at = calc_dates()
+    schedule.every().monday.at(first_remind_at).do(start)
+    schedule.every().wednesday.at(first_remind_at).do(start)
+    schedule.every().saturday.at(first_remind_at).do(start)
+    #   schedule.every().day.at(cs.first_remind_at).do(start)  # uncomment for checking code
 
-    schedule.every().day.at(cs.second_remind_at).do(end_of_day)
+    schedule.every().day.at(second_remind_at).do(end_of_day)
 
     while True:
         schedule.run_pending()
