@@ -12,12 +12,12 @@ from telebot import types
 import constants as cs
 import queries
 from constants import chat_id
-from utils import calc_dates
+import utils
 
 con = sqlite3.connect('database2.db', check_same_thread=False)
 cur = con.cursor()
 
-queries.create_table(month=cs.month_name)
+queries.create_table(month=utils.month_name, cur=cur, con=con)
 
 load_dotenv(find_dotenv())
 token = os.getenv('TOKEN')
@@ -43,7 +43,7 @@ buttons.add(button1, button2)
 
 
 def start():
-    bot.send_message(chat_id=chat_id, text=cs.hello_text,
+    bot.send_message(chat_id=chat_id, text=utils.hello(),
                      reply_markup=buttons)
 
 
@@ -58,18 +58,18 @@ def end_of_day():
 @bot.message_handler(content_types=['text'])
 def reg(message):  # adding data about today's workout to datebase
 
-    num_id = queries.get_num_id(month=cs.month_name)
-    date_now = cs.my_now.strftime('%d %B (%A)')
+    num_id = queries.get_num_id(month=utils.month_name, cur=cur)
+    date_now = utils.calc_date().strftime('%d %B (%A)')
 
     if message.text == 'Да':
         bot.send_message(message.chat.id, text=cs.reg_text1)
         wrk = "Выполнена"
-        queries.db_data_add(month=cs.month_name, id=num_id, workout_ex=wrk, date=date_now)
+        queries.db_data_add(month=utils.month_name, id=num_id, workout_ex=wrk, date=date_now, cur=cur, con=con)
 
     if message.text == 'Нет':
         bot.send_message(message.chat.id, text=cs.reg_text2)
         wrk = "Не выполнена"
-        queries.db_data_add(month=cs.month_name, id=num_id, workout_ex=wrk, date=date_now)
+        queries.db_data_add(month=utils.month_name, id=num_id, workout_ex=wrk, date=date_now, cur=cur, con=con)
 
 
 def answer(call):
@@ -109,11 +109,11 @@ def answer(call):
 
 
 def do_schedule():
-    first_remind_at, second_remind_at = calc_dates()
+    first_remind_at, second_remind_at = utils.times_of_remind()
     schedule.every().monday.at(first_remind_at).do(start)
     schedule.every().wednesday.at(first_remind_at).do(start)
     schedule.every().saturday.at(first_remind_at).do(start)
-    #   schedule.every().day.at(cs.first_remind_at).do(start)  # uncomment for checking code
+    schedule.every().day.at(first_remind_at).do(start)  # uncomment for checking code
 
     schedule.every().day.at(second_remind_at).do(end_of_day)
 
