@@ -20,3 +20,4 @@ tzlocal               ==4.3
 urllib3               ==1.26.15
 wheel                 ==0.37.1
 python-dotenv         ==1.0.0
+wemake-python-styleguide
