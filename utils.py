@@ -3,7 +3,6 @@ from datetime import time as dt_time
 from datetime import timedelta
 
 import arrow
-
 import constants as cs
 
 
@@ -33,7 +32,7 @@ def times_of_remind():
 
 def month_name():
     month_name = calc_date().strftime('%B')
-    return month_name
+    return str(month_name)
 
 
 def hello():

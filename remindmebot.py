@@ -17,10 +17,11 @@ import utils
 con = sqlite3.connect('database2.db', check_same_thread=False)
 cur = con.cursor()
 
-queries.create_table(month=utils.month_name, cur=cur, con=con)
+queries.create_table(month=utils.month_name(), con=con, cur=cur)
 
 load_dotenv(find_dotenv())
 token = os.getenv('TOKEN')
+
 bot = telebot.TeleBot(token)
 
 btn = types.InlineKeyboardMarkup(row_width=1)
@@ -58,20 +59,21 @@ def end_of_day():
 @bot.message_handler(content_types=['text'])
 def reg(message):  # adding data about today's workout to datebase
 
-    num_id = queries.get_num_id(month=utils.month_name, cur=cur)
+    num_id = queries.get_num_id(month=utils.month_name(), cur=cur)
     date_now = utils.calc_date().strftime('%d %B (%A)')
 
     if message.text == 'Да':
         bot.send_message(message.chat.id, text=cs.reg_text1)
         wrk = "Выполнена"
-        queries.db_data_add(month=utils.month_name, id=num_id, workout_ex=wrk, date=date_now, cur=cur, con=con)
+        queries.db_data_add(month=utils.month_name(), id=num_id, workout_ex=wrk, date=date_now, cur=cur, con=con)
 
     if message.text == 'Нет':
         bot.send_message(message.chat.id, text=cs.reg_text2)
         wrk = "Не выполнена"
-        queries.db_data_add(month=utils.month_name, id=num_id, workout_ex=wrk, date=date_now, cur=cur, con=con)
+        queries.db_data_add(month=utils.month_name(), id=num_id, workout_ex=wrk, date=date_now, cur=cur, con=con)
 
 
+@bot.callback_query_handler(func=lambda call: True)
 def answer(call):
     if call.data == 'now':
         bot.send_message(call.message.chat.id, text=cs.text_ready_gym_now, reply_markup=btn)
@@ -113,7 +115,7 @@ def do_schedule():
     schedule.every().monday.at(first_remind_at).do(start)
     schedule.every().wednesday.at(first_remind_at).do(start)
     schedule.every().saturday.at(first_remind_at).do(start)
-    schedule.every().day.at(first_remind_at).do(start)  # uncomment for checking code
+    #   schedule.every().day.at(first_remind_at).do(start)  # uncomment for checking code
 
     schedule.every().day.at(second_remind_at).do(end_of_day)
 

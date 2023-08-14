@@ -1,4 +1,7 @@
 import os
+from dotenv import find_dotenv, load_dotenv
+
+load_dotenv(find_dotenv())
 
 chat_id = os.getenv('CHAT_ID')  # (or change it for your chat_id)
 
@@ -33,5 +36,5 @@ question_text = "День подходит к концу. Уделила ли т
 reg_text1 = 'Ты молодец! Отдыхай!'
 reg_text2 = 'Я понял. Тренировки сегодня не было'
 
-first_time_h, first_time_m = 0, 20  # work at 10:00
-second_time_h, second_time_m = 23, 0  # work at 23:00
+first_time_h, first_time_m = 10, 0  # works at 10:00
+second_time_h, second_time_m = 23, 0  # works at 23:00
